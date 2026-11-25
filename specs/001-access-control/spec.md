@@ -150,7 +150,7 @@ The app follows the device's light or dark theme and works with a screen reader,
 - **Lockout for unknown usernames**: behaves exactly like a lockout for existing ones.
 - **Rapid double tap on save or delete**: only one operation happens.
 - **Typing then erasing back to the original values**: counts as "no changes", so no discard prompt appears.
-- **Clock changes on the device**: a backwards jump never extends a session beyond its timeout. If the elapsed time is negative, the session is treated as expired.
+- **Clock changes on the device**: a backwards jump never extends a session beyond its timeout. If the elapsed time is negative, the session is treated as expired. A forward jump can only shorten the session (it expires earlier), which is the safe direction and is accepted. Lockout durations follow the same clock: a forward jump may end a lockout early. This is accepted, because the password check still guards access.
 
 ## Requirements *(mandatory)*
 
@@ -162,7 +162,7 @@ The app follows the device's light or dark theme and works with a screen reader,
 - **FR-002**: System MUST NOT ship any default or pre-seeded account.
 - **FR-003**: Once at least one user exists, System MUST allow creating users only to a signed-in person.
 - **FR-004**: System MUST authenticate with username and password and sign the person in on success.
-- **FR-005**: System MUST show the same failure message, "Login ou senha inválidos.", for a nonexistent username and a wrong password, with comparable response time.
+- **FR-005**: System MUST show the same failure message, "Login ou senha inválidos.", for a nonexistent username and a wrong password, with comparable response time. "Comparable" means both paths perform the same work: exactly one password hash computation and one comparison. So the difference cannot exceed normal run-to-run variation.
 - **FR-006**: System MUST lock a username after 5 consecutive failed attempts for 30 seconds, doubling the lock duration on each subsequent lockout up to 5 minutes. The count MUST persist across app restarts and reset on successful sign-in.
 - **FR-007**: System MUST apply the lockout behavior and message identically to usernames that do not exist.
 
@@ -202,7 +202,7 @@ The app follows the device's light or dark theme and works with a screen reader,
 **Security and privacy**
 
 - **FR-027**: System MUST never store, display after entry, or log passwords in readable form. Passwords MUST be stored only in an irreversible, per-user salted form and compared in constant time.
-- **FR-028**: System MUST NOT write passwords, password-derived data, names, or usernames to logs.
+- **FR-028**: System MUST NOT write passwords, password-derived data, names, or usernames to logs, including in error, exception, and crash paths. App code MUST NOT call the console at all, and errors shown to the person MUST use the fixed messages of this spec, never raw error details.
 - **FR-029**: The session record MUST contain only the user identifier and the last activity time.
 - **FR-030**: Data passed between screens MUST include only user identifiers, never passwords or password-derived data. Password hashes and salts MUST never leave the data-handling layer toward any screen.
 - **FR-031**: If stored data cannot be read, System MUST show an error and MUST NOT behave as if no users exist (fail closed). The error screen MUST offer "Apagar dados e recomeçar", which erases all app data only after the person types `APAGAR` to confirm.
