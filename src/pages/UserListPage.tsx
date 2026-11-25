@@ -23,7 +23,7 @@ type Props = NativeStackScreenProps<PrivateStackParamList, 'users'>;
 export function UserListPage({ navigation }: Props) {
   const { colors, type, space } = useTheme();
   const insets = useSafeAreaInsets();
-  const { userId, listUsers, signOut } = useSession();
+  const { userId, listUsers, signOut, validMinutesLeft } = useSession();
   const [users, setUsers] = useState<UserView[] | null>(null);
 
   useLayoutEffect(() => {
@@ -74,7 +74,14 @@ export function UserListPage({ navigation }: Props) {
       ItemSeparatorComponent={RowDivider}
       ListHeaderComponent={
         <View style={{ padding: space.md, paddingBottom: space.lg }}>
-          {me ? <SessionBadge name={me.name} username={me.username} userCount={rows.length} /> : null}
+          {me ? (
+            <SessionBadge
+              name={me.name}
+              username={me.username}
+              userCount={rows.length}
+              validMinutesLeft={validMinutesLeft}
+            />
+          ) : null}
         </View>
       }
       ListFooterComponent={

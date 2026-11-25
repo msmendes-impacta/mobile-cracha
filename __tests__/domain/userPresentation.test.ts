@@ -5,6 +5,7 @@ import {
   initials,
   sessionBadgeAccessibilityLabel,
   sessionValidityLabel,
+  sessionWarningMessage,
   sortUsersByName,
   userCountLabel,
   userRowAccessibilityLabel,
@@ -108,6 +109,17 @@ describe('sessionValidityLabel', () => {
   it('never shows zero or negative minutes', () => {
     expect(sessionValidityLabel(0)).toBe('Sessão válida por menos de 1 min');
     expect(sessionValidityLabel(-3)).toBe('Sessão válida por menos de 1 min');
+  });
+});
+
+describe('sessionWarningMessage', () => {
+  it('counts down in seconds, singular at one (FR-023)', () => {
+    expect(sessionWarningMessage(60)).toBe('Sua sessão vai expirar em 60 segundos.');
+    expect(sessionWarningMessage(1)).toBe('Sua sessão vai expirar em 1 segundo.');
+  });
+
+  it('never shows zero or negative seconds', () => {
+    expect(sessionWarningMessage(0)).toBe('Sua sessão vai expirar em 1 segundo.');
   });
 });
 

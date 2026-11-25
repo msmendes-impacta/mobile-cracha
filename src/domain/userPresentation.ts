@@ -74,6 +74,12 @@ export function sessionValidityLabel(minutesLeft: number): string {
   return minutesLeft >= 1 ? `Sessão válida por ${minutesLeft} min` : 'Sessão válida por menos de 1 min';
 }
 
+/** Text of the inactivity warning, with a live countdown (FR-023). */
+export function sessionWarningMessage(secondsLeft: number): string {
+  const seconds = Math.max(1, secondsLeft);
+  return `Sua sessão vai expirar em ${seconds} ${seconds === 1 ? 'segundo' : 'segundos'}.`;
+}
+
 function spokenMinutes(minutesLeft: number): string {
   if (minutesLeft < 1) return 'menos de 1 minuto';
   return minutesLeft === 1 ? '1 minuto' : `${minutesLeft} minutos`;
