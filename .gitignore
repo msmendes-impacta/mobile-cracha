@@ -43,3 +43,11 @@ Thumbs.db
 
 # Materiais da disciplina e anotações locais
 docs/
+
+# Ferramentas locais (Spec Kit, Claude Code, Impeccable)
+.specify/
+.claude/
+.impeccable/
+
+# Relatórios de teste
+coverage/
