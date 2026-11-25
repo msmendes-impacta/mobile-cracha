@@ -4,6 +4,7 @@ import { StyleSheet, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { SessionProvider } from './src/contexts/SessionContext';
+import { SnackbarProvider } from './src/contexts/SnackbarContext';
 import { RootNavigator } from './src/navigation/RootNavigator';
 import { useTheme } from './src/theme/useTheme';
 
@@ -26,9 +27,11 @@ function AppShell() {
   return (
     // Root view: touch activity is wired to the session controller in US5 (T054).
     <View style={[styles.root, { backgroundColor: theme.colors.background }]}>
-      <NavigationContainer theme={navTheme}>
-        <RootNavigator />
-      </NavigationContainer>
+      <SnackbarProvider>
+        <NavigationContainer theme={navTheme}>
+          <RootNavigator />
+        </NavigationContainer>
+      </SnackbarProvider>
       <StatusBar style={theme.dark ? 'light' : 'dark'} />
     </View>
   );

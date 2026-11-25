@@ -4,7 +4,12 @@ import type { UserInput, UserView } from '../models/user';
 import type { SignInResult } from '../services/auth.service';
 import { createAppServices } from '../services/container';
 import { expoCryptoAdapter } from '../services/expoCrypto.adapter';
-import { CorruptDataError, FirstUserNotAllowedError, type SaveUserResult } from '../services/user.repo';
+import {
+  CorruptDataError,
+  FirstUserNotAllowedError,
+  UserNotFoundError,
+  type SaveUserResult,
+} from '../services/user.repo';
 import { resolveBootStatus } from '../session/bootStatus';
 import { clearSession, loadSession, saveSession } from '../session/session.store';
 
@@ -21,6 +26,10 @@ export interface SessionContextValue {
   listUsers(): Promise<UserView[]>;
   /** Signed-in creation of another user. */
   createUser(input: UserInput): Promise<SaveUserResult>;
+  /** The user to edit, without credentials; undefined when it no longer exists. */
+  getUser(id: string): Promise<UserView | undefined>;
+  /** Edit; resolves to `notFound` when the user was removed meanwhile. */
+  updateUser(id: string, input: UserInput): Promise<SaveUserResult | { ok: false; notFound: true }>;
   signOut(): Promise<void>;
 }
 
@@ -119,14 +128,39 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     [failClosed],
   );
 
+  const getUser = useCallback(
+    async (id: string): Promise<UserView | undefined> => {
+      try {
+        return await services.users.getById(id);
+      } catch {
+        failClosed();
+        return undefined;
+      }
+    },
+    [failClosed],
+  );
+
+  const updateUser = useCallback(
+    async (id: string, input: UserInput): Promise<SaveUserResult | { ok: false; notFound: true }> => {
+      try {
+        return await services.users.updateUser(id, input);
+      } catch (error) {
+        if (error instanceof UserNotFoundError) return { ok: false, notFound: true };
+        failClosed();
+        return { ok: false, errors: {} };
+      }
+    },
+    [failClosed],
+  );
+
   const signOut = useCallback(async () => {
     await clearSession();
     setState({ status: 'signedOut', usersExist: true });
   }, []);
 
   const value = useMemo<SessionContextValue>(
-    () => ({ ...state, signIn, createFirstUser, listUsers, createUser, signOut }),
-    [state, signIn, createFirstUser, listUsers, createUser, signOut],
+    () => ({ ...state, signIn, createFirstUser, listUsers, createUser, getUser, updateUser, signOut }),
+    [state, signIn, createFirstUser, listUsers, createUser, getUser, updateUser, signOut],
   );
 
   return <SessionContext.Provider value={value}>{children}</SessionContext.Provider>;
