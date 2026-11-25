@@ -66,7 +66,7 @@ Rode no modo de desenvolvimento, a partir de uma instalação limpa. O roteiro c
 
 | # | Passo | Resultado esperado |
 |---|---|---|
-| 1 | Abrir o app pela primeira vez | Crachá de login com "Criar primeiro usuário" |
+| 1 | Abrir o app pela primeira vez | O crachá mostra "Nenhum usuário cadastrado" e o botão "Criar primeiro usuário", sem os campos de login |
 | 2 | Criar "Matheus Mendes", login `Matheus`, senha `senha123` | Entra direto; a lista mostra "Olá, Matheus", "1 usuário cadastrado" e a marca "você" |
 | 3 | Adicionar "Nicoli Ferreira" (`nicoli.f`); tentar outro usuário com o login ` MATHEUS ` | Nicoli é salva; o repetido mostra "Este login já está em uso." |
 | 4 | Editar Nicoli com a senha em branco e salvar; entrar como ela | A senha antiga continua valendo |

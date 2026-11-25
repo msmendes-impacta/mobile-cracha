@@ -132,7 +132,15 @@ export function UserFormPage({ navigation, route }: UserFormProps) {
         onSubmit={save}
         footer={
           canDelete ? (
-            <View style={{ marginTop: space.md }}>
+            // Set apart from "Salvar" so the destructive action never reads as its twin.
+            <View
+              style={{
+                marginTop: space.xl,
+                paddingTop: space.xl,
+                borderTopWidth: StyleSheet.hairlineWidth,
+                borderTopColor: colors.outlineVariant,
+              }}
+            >
               <PrimaryButton
                 label="Excluir"
                 icon="delete-outline"

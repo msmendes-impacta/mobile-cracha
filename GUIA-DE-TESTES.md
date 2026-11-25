@@ -37,11 +37,12 @@ Durante o roteiro, anote o que der diferente do esperado: número do passo, o qu
 
 ### 3.1 Primeiro acesso e lista
 
-- [ ] **1.** Abra o app pela primeira vez. Aparece o crachá de login com o botão "Criar primeiro usuário".
-- [ ] **2.** Toque em "Criar primeiro usuário" e cadastre "Matheus Mendes", login `Matheus`, senha `senha123`. O app entra direto. A lista mostra o crachá "Olá, Matheus", "1 usuário cadastrado", a validade da sessão e a sua linha com a marca "você".
+- [ ] **1.** Abra o app pela primeira vez. O crachá mostra "Nenhum usuário cadastrado" e o botão "Criar primeiro usuário", sem os campos de login.
+- [ ] **2.** Toque em "Criar primeiro usuário" e cadastre "Matheus Mendes", login `Matheus`, senha `senha123`. O app entra direto. A lista mostra o crachá "Olá, Matheus", "1 usuário cadastrado", a validade da sessão e a sua linha com a marca "você". Abaixo, a dica para cadastrar outra pessoa mostra o mesmo ícone do botão do cabeçalho. Segure o dedo sobre um ícone do cabeçalho: aparece o nome da ação ("Adicionar usuário" ou "Sair").
 
 ### 3.2 Cadastro e edição
 
+- [ ] **2b.** Ao cadastrar, preencha os quatro campos só pelo teclado (botão "próximo"), sem tocar na tela, por mais de 30 segundos. O aviso de sessão **não** aparece enquanto você digita.
 - [ ] **3.** Toque em "Adicionar usuário" (ícone no cabeçalho) e cadastre "Nicoli Ferreira", login `nicoli.f`, senha `outra123`. Volta para a lista com "Usuário salvo".
 - [ ] **4.** Tente cadastrar mais alguém com o login ` MATHEUS ` (com espaços e em maiúsculas). Aparece "Este login já está em uso." no campo de login.
 - [ ] **5.** Abra Nicoli, troque o nome, deixe a senha em branco e salve. Saia e entre como `nicoli.f` / `outra123`: a senha antiga continua valendo.

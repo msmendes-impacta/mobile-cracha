@@ -78,8 +78,7 @@ export function LoginPage({ navigation }: Props) {
     setSubmitting(false);
 
     if (result.status === 'invalid') {
-      setFormError(INVALID_MESSAGE);
-      AccessibilityInfo.announceForAccessibility(INVALID_MESSAGE);
+      setFormError(INVALID_MESSAGE); // read by the live region around the message
       passwordRef.current?.focus();
     } else if (result.status === 'locked') {
       setLockedUntil(Date.now() + result.seconds * 1000);
@@ -112,82 +111,93 @@ export function LoginPage({ navigation }: Props) {
       ) : null}
 
       <Badge>
-        <TextField
-          ref={usernameRef}
-          label="Login"
-          value={username}
-          onChangeText={(text) => {
-            setUsername(text);
-            if (fieldErrors.username) setFieldErrors((e) => ({ ...e, username: undefined }));
-          }}
-          error={fieldErrors.username}
-          autoCapitalize="none"
-          autoCorrect={false}
-          autoComplete="username"
-          textContentType="username"
-          returnKeyType="next"
-          submitBehavior="submit"
-          onSubmitEditing={() => passwordRef.current?.focus()}
-        />
-        <TextField
-          ref={passwordRef}
-          label="Senha"
-          value={password}
-          onChangeText={(text) => {
-            setPassword(text);
-            if (fieldErrors.password) setFieldErrors((e) => ({ ...e, password: undefined }));
-          }}
-          error={fieldErrors.password}
-          secure
-          autoCapitalize="none"
-          autoCorrect={false}
-          autoComplete="current-password"
-          textContentType="password"
-          returnKeyType="done"
-          onSubmitEditing={handleSubmit}
-        />
-
-        {shownError ? (
-          // No live region: the lock countdown changes every second. Messages are announced explicitly.
-          <View
-            style={[
-              styles.formError,
-              { backgroundColor: colors.errorContainer, borderRadius: 8, padding: space.sm, marginBottom: space.md },
-            ]}
-          >
-            <MaterialCommunityIcons
-              name={locked ? 'lock-clock' : 'alert-circle'}
-              size={20}
-              color={colors.onErrorContainer}
+        {usersExist ? (
+          <>
+            <TextField
+              ref={usernameRef}
+              label="Login"
+              value={username}
+              onChangeText={(text) => {
+                setUsername(text);
+                if (fieldErrors.username) setFieldErrors((e) => ({ ...e, username: undefined }));
+              }}
+              error={fieldErrors.username}
+              autoCapitalize="none"
+              autoCorrect={false}
+              autoComplete="username"
+              textContentType="username"
+              returnKeyType="next"
+              submitBehavior="submit"
+              onSubmitEditing={() => passwordRef.current?.focus()}
             />
-            <Text style={[type.bodySmall, styles.formErrorText, { color: colors.onErrorContainer }]}>
-              {shownError}
+            <TextField
+              ref={passwordRef}
+              label="Senha"
+              value={password}
+              onChangeText={(text) => {
+                setPassword(text);
+                if (fieldErrors.password) setFieldErrors((e) => ({ ...e, password: undefined }));
+              }}
+              error={fieldErrors.password}
+              secure
+              autoCapitalize="none"
+              autoCorrect={false}
+              autoComplete="current-password"
+              textContentType="password"
+              returnKeyType="done"
+              onSubmitEditing={handleSubmit}
+            />
+
+            {/*
+              Always mounted, so a new message is a content change TalkBack reads by itself
+              (live region). It is off while locked: the countdown changes every second, and
+              the lock start is announced once instead.
+            */}
+            <View accessibilityLiveRegion={locked ? 'none' : 'polite'}>
+              {shownError ? (
+                <View
+                  style={[
+                    styles.formError,
+                    { backgroundColor: colors.errorContainer, borderRadius: 8, padding: space.sm, marginBottom: space.md },
+                  ]}
+                >
+                  <MaterialCommunityIcons
+                    name={locked ? 'lock-clock' : 'alert-circle'}
+                    size={20}
+                    color={colors.onErrorContainer}
+                  />
+                  <Text style={[type.bodySmall, styles.formErrorText, { color: colors.onErrorContainer }]}>
+                    {shownError}
+                  </Text>
+                </View>
+              ) : null}
+            </View>
+
+            <PrimaryButton
+              label="Entrar"
+              icon="login"
+              onPress={handleSubmit}
+              loading={submitting}
+              disabled={locked}
+            />
+          </>
+        ) : (
+          // First access: nobody can sign in yet, so the badge offers the only useful action.
+          <View>
+            <Text style={[type.title, { color: colors.onSurface }]} accessibilityRole="header">
+              Nenhum usuário cadastrado
             </Text>
+            <Text style={[type.body, { color: colors.onSurfaceVariant, marginTop: space.xs, marginBottom: space.lg }]}>
+              Crie o primeiro usuário deste aparelho para começar a usar o Crachá.
+            </Text>
+            <PrimaryButton
+              label="Criar primeiro usuário"
+              icon="account-plus-outline"
+              onPress={() => navigation.navigate('firstUser')}
+            />
           </View>
-        ) : null}
-
-        <PrimaryButton
-          label="Entrar"
-          icon="login"
-          onPress={handleSubmit}
-          loading={submitting}
-          disabled={locked}
-        />
+        )}
       </Badge>
-
-      {!usersExist ? (
-        <View style={{ marginTop: space.lg }}>
-          <Text style={[type.bodySmall, styles.centered, { color: colors.onSurfaceVariant, marginBottom: space.xs }]}>
-            Nenhum usuário cadastrado ainda.
-          </Text>
-          <PrimaryButton
-            label="Criar primeiro usuário"
-            icon="account-plus-outline"
-            variant="text"
-            onPress={() => navigation.navigate('firstUser')}
-          />
-        </View>
-      ) : null}
     </ScrollView>
   );
 }
