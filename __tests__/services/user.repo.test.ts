@@ -4,7 +4,7 @@ import { MESSAGES } from '../../src/domain/validateUser';
 import { createAppServices } from '../../src/services/container';
 import { createLoginAttemptsRepository } from '../../src/services/loginAttempts.repo';
 import { createPasswordService } from '../../src/services/password.service';
-import { STORAGE_KEYS } from '../../src/services/storage';
+import { resetAll, STORAGE_KEYS } from '../../src/services/storage';
 import {
   CorruptDataError,
   createUserRepository,
@@ -248,5 +248,38 @@ describe('deleteUser (FR-018, FR-019)', () => {
     await s.users.deleteUser(second.user.id, first.user.id);
 
     await expect(s.auth.signIn('nicoli.f', 'outra123', T0)).resolves.toEqual({ status: 'invalid' });
+  });
+});
+
+describe('corrupt data and reset (FR-031)', () => {
+  it.each([
+    ['malformed JSON', '{'],
+    ['an object instead of a list', '{"id":"x"}'],
+    ['a list with an invalid user', '[{"id":"x","name":"Ana"}]'],
+    ['a JSON string', '"users"'],
+    ['JSON null', 'null'],
+  ])('never reports %s as absent', async (_label, raw) => {
+    await AsyncStorage.setItem(STORAGE_KEYS.users, raw);
+    await expect(repo.loadUsers()).resolves.toEqual({ status: 'corrupt' });
+    await expect(repo.createFirstUser(matheus)).rejects.toBeInstanceOf(CorruptDataError);
+  });
+
+  it('keeps an emptied list as ok, not absent (first access stays closed)', async () => {
+    await AsyncStorage.setItem(STORAGE_KEYS.users, '[]');
+    await expect(repo.loadUsers()).resolves.toEqual({ status: 'ok', value: [] });
+    await expect(repo.createFirstUser(matheus)).rejects.toBeInstanceOf(FirstUserNotAllowedError);
+  });
+
+  it('reads absent after resetAll, so the first user can be created again', async () => {
+    await AsyncStorage.setItem(STORAGE_KEYS.users, '{');
+    await AsyncStorage.setItem(STORAGE_KEYS.session, '{"userId":"x","lastActivityAt":1}');
+    await AsyncStorage.setItem(STORAGE_KEYS.attempts, '{}');
+
+    await resetAll();
+
+    await expect(repo.loadUsers()).resolves.toEqual({ status: 'absent' });
+    expect(await AsyncStorage.getItem(STORAGE_KEYS.session)).toBeNull();
+    expect(await AsyncStorage.getItem(STORAGE_KEYS.attempts)).toBeNull();
+    await expect(repo.createFirstUser(matheus)).resolves.toMatchObject({ ok: true });
   });
 });
