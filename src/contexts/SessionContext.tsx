@@ -12,7 +12,9 @@ import {
   UserNotFoundError,
   type SaveUserResult,
 } from '../services/user.repo';
+import { resetAll } from '../services/storage';
 import { resolveBootStatus } from '../session/bootStatus';
+import { resetAppData } from '../session/resetAppData';
 import { SessionController, type SessionChange } from '../session/SessionController';
 import { clearSession, loadSession, saveSession } from '../session/session.store';
 
@@ -46,6 +48,11 @@ export interface SessionContextValue {
   keepAlive(): void;
   /** A touch or a screen change (FR-021). Cheap; safe to call on every touch. */
   recordActivity(): void;
+  /**
+   * "Apagar dados e recomeçar" (FR-031), only after the typed APAGAR confirmation. True when
+   * the app is back at first access; false keeps the data error screen.
+   */
+  resetAllData(): Promise<boolean>;
 }
 
 type State = Pick<
@@ -263,6 +270,18 @@ export function SessionProvider({ children }: { children: ReactNode }) {
 
   const recordActivity = useCallback(() => controller.recordActivity(), [controller]);
 
+  const resetAllData = useCallback(async (): Promise<boolean> => {
+    try {
+      const boot = await resetAppData({ resetAll, loadUsers: services.users.loadUsers });
+      if (boot.status === 'dataError') return false;
+      controller.abandon();
+      setState({ status: boot.status, usersExist: boot.usersExist, expiredNotice: false });
+      return true;
+    } catch {
+      return false;
+    }
+  }, [controller]);
+
   const value = useMemo<SessionContextValue>(
     () => ({
       ...state,
@@ -276,6 +295,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       signOut,
       keepAlive,
       recordActivity,
+      resetAllData,
     }),
     [
       state,
@@ -289,6 +309,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       signOut,
       keepAlive,
       recordActivity,
+      resetAllData,
     ],
   );
 
