@@ -2,6 +2,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useState, type ComponentRef, type Ref } from 'react';
 import { Pressable, StyleSheet, Text, TextInput, View, type TextInputProps } from 'react-native';
 
+import { useSession } from '../../contexts/SessionContext';
 import { useTheme } from '../../theme/useTheme';
 
 export interface TextFieldProps extends Omit<TextInputProps, 'style' | 'secureTextEntry'> {
@@ -27,10 +28,15 @@ export function TextField({
   value,
   onFocus,
   onBlur,
+  onChangeText,
+  onSubmitEditing,
   ref,
   ...inputProps
 }: TextFieldProps) {
   const { colors, type, space, radius } = useTheme();
+  // The soft keyboard is another window, so typing never reaches the root onTouchStart.
+  // Count it as activity, or the session could expire mid-form (FR-021). A no-op when signed out.
+  const { recordActivity } = useSession();
   const [focused, setFocused] = useState(false);
   const [revealed, setRevealed] = useState(false);
 
@@ -88,6 +94,14 @@ export function TextField({
           onBlur={(e) => {
             setFocused(false);
             onBlur?.(e);
+          }}
+          onChangeText={(text) => {
+            recordActivity();
+            onChangeText?.(text);
+          }}
+          onSubmitEditing={(e) => {
+            recordActivity();
+            onSubmitEditing?.(e);
           }}
           style={[type.body, styles.input, { color: colors.onSurface, paddingHorizontal: space.md }]}
           {...inputProps}
