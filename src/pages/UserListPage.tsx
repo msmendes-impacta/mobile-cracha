@@ -88,15 +88,19 @@ export function UserListPage({ navigation }: Props) {
         rows.length === 1 ? (
           <View style={[styles.hint, { padding: space.lg, gap: space.sm }]}>
             <MaterialCommunityIcons
-              name="account-plus-outline"
+              name="account-plus"
               size={24}
               color={colors.onSurfaceVariant}
               importantForAccessibility="no"
               accessibilityElementsHidden
             />
-            <Text style={[type.bodySmall, styles.hintText, { color: colors.onSurfaceVariant }]}>
-              Por enquanto, só você tem acesso. Toque em Adicionar usuário, no topo da tela, para cadastrar
-              outra pessoa.
+            {/* Sighted users match the icon; TalkBack users hear the button's spoken name. */}
+            <Text
+              style={[type.bodySmall, styles.hintText, { color: colors.onSurfaceVariant }]}
+              accessibilityLabel="Por enquanto, só você tem acesso. Para cadastrar outra pessoa, toque em Adicionar usuário, no topo da tela."
+            >
+              Por enquanto, só você tem acesso. Para cadastrar outra pessoa, toque neste ícone no topo da
+              tela.
             </Text>
           </View>
         ) : undefined

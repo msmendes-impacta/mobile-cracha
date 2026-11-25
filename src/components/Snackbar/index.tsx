@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { AccessibilityInfo, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useTheme } from '../../theme/useTheme';
@@ -11,37 +11,41 @@ export interface SnackbarProps {
   duration?: number;
 }
 
-/** Transient feedback ("Usuário salvo"), announced to screen readers (FR-039). */
+/**
+ * Transient feedback ("Usuário salvo"), read by screen readers (FR-039). The live region stays
+ * mounted, so each new message is a content change TalkBack reads once, without a separate
+ * announcement.
+ */
 export function Snackbar({ message, onDismiss, duration = 4000 }: SnackbarProps) {
   const { colors, type, space, radius } = useTheme();
   const insets = useSafeAreaInsets();
 
   useEffect(() => {
     if (!message) return;
-    AccessibilityInfo.announceForAccessibility(message);
     const timer = setTimeout(onDismiss, duration);
     return () => clearTimeout(timer);
   }, [message, duration, onDismiss]);
 
-  if (!message) return null;
-
   return (
-    <View
-      pointerEvents="none"
-      style={[
-        styles.bar,
-        {
-          bottom: insets.bottom + space.md,
-          left: space.md,
-          right: space.md,
-          backgroundColor: colors.inverseSurface,
-          borderRadius: radius.sm,
-          paddingHorizontal: space.md,
-          paddingVertical: space.sm,
-        },
-      ]}
-    >
-      <Text style={[type.bodySmall, { color: colors.inverseOnSurface }]}>{message}</Text>
+    <View pointerEvents="none" accessibilityLiveRegion="polite" style={StyleSheet.absoluteFill}>
+      {message ? (
+        <View
+          style={[
+            styles.bar,
+            {
+              bottom: insets.bottom + space.md,
+              left: space.md,
+              right: space.md,
+              backgroundColor: colors.inverseSurface,
+              borderRadius: radius.sm,
+              paddingHorizontal: space.md,
+              paddingVertical: space.sm,
+            },
+          ]}
+        >
+          <Text style={[type.bodySmall, { color: colors.inverseOnSurface }]}>{message}</Text>
+        </View>
+      ) : null}
     </View>
   );
 }
