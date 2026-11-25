@@ -37,35 +37,35 @@ Durante o roteiro, anote o que der diferente do esperado: número do passo, o qu
 
 ### 3.1 Primeiro acesso e lista
 
-- [ ] **1.** Abra o app pela primeira vez. O crachá mostra "Nenhum usuário cadastrado" e o botão "Criar primeiro usuário", sem os campos de login.
-- [ ] **2.** Toque em "Criar primeiro usuário" e cadastre "Matheus Mendes", login `Matheus`, senha `senha123`. O app entra direto. A lista mostra o crachá "Olá, Matheus", "1 usuário cadastrado", a validade da sessão e a sua linha com a marca "você". Abaixo, a dica para cadastrar outra pessoa mostra o mesmo ícone do botão do cabeçalho. Segure o dedo sobre um ícone do cabeçalho: aparece o nome da ação ("Adicionar usuário" ou "Sair").
+- [x] **1.** Abra o app pela primeira vez. O crachá mostra "Nenhum usuário cadastrado" e o botão "Criar primeiro usuário", sem os campos de login.
+- [x] **2.** Toque em "Criar primeiro usuário" e cadastre "Matheus Mendes", login `Matheus`, senha `senha123`. O app entra direto. A lista mostra o crachá "Olá, Matheus", "1 usuário cadastrado", a validade da sessão e a sua linha com a marca "você". Abaixo, a dica para cadastrar outra pessoa mostra o mesmo ícone do botão do cabeçalho. Segure o dedo sobre um ícone do cabeçalho: aparece o nome da ação ("Adicionar usuário" ou "Sair").
 
 ### 3.2 Cadastro e edição
 
-- [ ] **2b.** Ao cadastrar, preencha os quatro campos só pelo teclado (botão "próximo"), sem tocar na tela, por mais de 30 segundos. O aviso de sessão **não** aparece enquanto você digita.
-- [ ] **3.** Toque em "Adicionar usuário" (ícone no cabeçalho) e cadastre "Nicoli Ferreira", login `nicoli.f`, senha `outra123`. Volta para a lista com "Usuário salvo".
-- [ ] **4.** Tente cadastrar mais alguém com o login ` MATHEUS ` (com espaços e em maiúsculas). Aparece "Este login já está em uso." no campo de login.
-- [ ] **5.** Abra Nicoli, troque o nome, deixe a senha em branco e salve. Saia e entre como `nicoli.f` / `outra123`: a senha antiga continua valendo.
-- [ ] **6.** Num formulário, altere um campo e toque na seta de voltar, ou use o Voltar do sistema. Aparece "Descartar alterações?", com "Descartar" e "Continuar editando".
+- [x] **2b.** Ao cadastrar, preencha os quatro campos só pelo teclado (botão "próximo"), sem tocar na tela, por mais de 30 segundos. O aviso de sessão **não** aparece enquanto você digita.
+- [x] **3.** Toque em "Adicionar usuário" (ícone no cabeçalho) e cadastre "Nicoli Ferreira", login `nicoli.f`, senha `outra123`. Volta para a lista com "Usuário salvo".
+- [x] **4.** Tente cadastrar mais alguém com o login ` MATHEUS ` (com espaços e em maiúsculas). Aparece "Este login já está em uso." no campo de login.
+- [x] **5.** Abra Nicoli, troque o nome, deixe a senha em branco e salve. Saia e entre como `nicoli.f` / `outra123`: a senha antiga continua valendo.
+- [x] **6.** Num formulário, altere um campo e toque na seta de voltar, ou use o Voltar do sistema. Aparece "Descartar alterações?", com "Descartar" e "Continuar editando".
 
 ### 3.3 Exclusão
 
-- [ ] **7.** Abra o seu próprio cadastro. Não há botão "Excluir".
-- [ ] **8.** Abra o cadastro de outra pessoa e toque em "Excluir". O diálogo pergunta "Excluir <nome>?". Confirme: a pessoa some da lista e aparece "Usuário excluído".
+- [x] **7.** Abra o seu próprio cadastro. Não há botão "Excluir".
+- [x] **8.** Abra o cadastro de outra pessoa e toque em "Excluir". O diálogo pergunta "Excluir <nome>?". Confirme: a pessoa some da lista e aparece "Usuário excluído".
 
 ### 3.4 Login e bloqueio
 
-- [ ] **9.** Saia ("Sair" no cabeçalho). Aperte o Voltar do sistema: o app fecha ou continua no login, e nenhuma tela de dentro aparece.
-- [ ] **10.** Erre a senha 5 vezes. Na 6ª tentativa aparece "Muitas tentativas. Tente novamente em 30 segundos.", o botão "Entrar" fica desabilitado e a contagem diminui até zero.
-- [ ] **11.** Repita com um login que não existe. O comportamento é o mesmo, com a mesma mensagem de erro, para não revelar quais logins existem.
+- [x] **9.** Saia ("Sair" no cabeçalho). Aperte o Voltar do sistema: o app fecha ou continua no login, e nenhuma tela de dentro aparece.
+- [x] **10.** Erre a senha 5 vezes. Na 6ª tentativa aparece "Muitas tentativas. Tente novamente em 30 segundos.", o botão "Entrar" fica desabilitado e a contagem diminui até zero.
+- [x] **11.** Repita com um login que não existe. O comportamento é o mesmo, com a mesma mensagem de erro, para não revelar quais logins existem.
 
 ### 3.5 Sessão por inatividade
 
-- [ ] **12.** Entre e não toque em nada. Por volta dos 20 segundos aparece "Você ainda está aí?", com a contagem "Sua sessão vai expirar em N segundos.".
-- [ ] **13.** Toque em "Continuar conectado". O aviso fecha e o prazo de 30 segundos recomeça: o aviso só volta depois de mais 20 segundos sem uso.
-- [ ] **14.** Deixe o aviso chegar a zero sem tocar. O app volta ao login com a faixa "Sua sessão expirou por inatividade. Entre novamente.".
-- [ ] **15.** Entre, mande o app para segundo plano (botão Início) e volte depois de mais de 30 segundos. O app mostra o login com o mesmo aviso.
-- [ ] **16.** Feche o app por completo e abra de novo depois do prazo. Ele vai para o login sem a faixa de aviso.
+- [x] **12.** Entre e não toque em nada. Por volta dos 20 segundos aparece "Você ainda está aí?", com a contagem "Sua sessão vai expirar em N segundos.".
+- [x] **13.** Toque em "Continuar conectado". O aviso fecha e o prazo de 30 segundos recomeça: o aviso só volta depois de mais 20 segundos sem uso.
+- [x] **14.** Deixe o aviso chegar a zero sem tocar. O app volta ao login com a faixa "Sua sessão expirou por inatividade. Entre novamente.".
+- [x] **15.** Entre, mande o app para segundo plano (botão Início) e volte depois de mais de 30 segundos. O app mostra o login com o mesmo aviso.
+- [x] **16.** Feche o app por completo e abra de novo depois do prazo. Ele vai para o login sem a faixa de aviso.
 
 ## 4. Tela de erro de dados
 
@@ -88,10 +88,10 @@ Os dados continuam corrompidos depois de tirar as linhas. Isso é proposital: as
 
 ### 4.2 Verificar a tela e o reset
 
-- [ ] **17.** Aparece a tela "Não foi possível ler os dados", com o botão "Apagar dados e recomeçar". Não aparece "Criar primeiro usuário", e o Voltar do sistema não leva a outra tela.
-- [ ] **18.** Toque em "Apagar dados e recomeçar". O diálogo "Apagar todos os dados?" abre com o campo "Digite APAGAR para confirmar". O botão "Apagar" fica desabilitado com `apagar`, `APAGA` ou qualquer outra coisa diferente de `APAGAR`.
-- [ ] **19.** Toque em "Cancelar". O diálogo fecha e a tela de erro continua. Abra de novo: o campo vem vazio.
-- [ ] **20.** Digite `APAGAR` e confirme. O app volta ao login com "Criar primeiro usuário".
+- [x] **17.** Aparece a tela "Não foi possível ler os dados", com o botão "Apagar dados e recomeçar". Não aparece "Criar primeiro usuário", e o Voltar do sistema não leva a outra tela.
+- [x] **18.** Toque em "Apagar dados e recomeçar". O diálogo "Apagar todos os dados?" abre com o campo "Digite APAGAR para confirmar". O botão "Apagar" fica desabilitado com `apagar`, `APAGA` ou qualquer outra coisa diferente de `APAGAR`.
+- [x] **19.** Toque em "Cancelar". O diálogo fecha e a tela de erro continua. Abra de novo: o campo vem vazio.
+- [x] **20.** Digite `APAGAR` e confirme. O app volta ao login com "Criar primeiro usuário".
 
 Antes de commitar, confira com `git diff index.ts` que as linhas do passo 4.1 saíram.
 
@@ -108,25 +108,25 @@ Configurações do Android (os nomes variam um pouco entre fabricantes):
 
 Percorra todas as telas e diálogos arrastando o dedo para a direita.
 
-- [ ] **21.** Todo botão é lido com nome e função, inclusive os que só têm ícone: "Adicionar usuário", "Sair", "Mostrar senha".
-- [ ] **22.** Cada campo é lido uma vez só, com o rótulo. Quando tem erro, ele é lido junto ("Login, erro: Informe o login.").
-- [ ] **23.** Cada linha da lista é lida como um item só, por exemplo "Matheus Mendes (você), login matheus", seguida da dica de toque duplo para editar.
-- [ ] **24.** O crachá da lista é lido como "Matheus Mendes, login matheus, 1 usuário cadastrado, sessão válida por…", com o número de usuários do momento. A presilha, o código de barras e o mini crachá não são lidos.
-- [ ] **25.** Ao salvar um formulário com erro, o foco vai para o primeiro campo errado e o erro é anunciado.
-- [ ] **26.** Login inválido, bloqueio, aviso de sessão, sessão expirada, "Usuário salvo", "Usuário excluído" e a tela de erro de dados são anunciados **uma vez**. A contagem do bloqueio e a do aviso de sessão **não** são lidas a cada segundo.
+- [x] **21.** Todo botão é lido com nome e função, inclusive os que só têm ícone: "Adicionar usuário", "Sair", "Mostrar senha".
+- [x] **22.** Cada campo é lido uma vez só, com o rótulo. Quando tem erro, ele é lido junto ("Login, erro: Informe o login.").
+- [x] **23.** Cada linha da lista é lida como um item só, por exemplo "Matheus Mendes (você), login matheus", seguida da dica de toque duplo para editar.
+- [x] **24.** O crachá da lista é lido como "Matheus Mendes, login matheus, 1 usuário cadastrado, sessão válida por…", com o número de usuários do momento. A presilha, o código de barras e o mini crachá não são lidos.
+- [x] **25.** Ao salvar um formulário com erro, o foco vai para o primeiro campo errado e o erro é anunciado.
+- [x] **26.** Login inválido, bloqueio, aviso de sessão, sessão expirada, "Usuário salvo", "Usuário excluído" e a tela de erro de dados são anunciados **uma vez**. A contagem do bloqueio e a do aviso de sessão **não** são lidas a cada segundo.
 
 ### 5.2 Fonte em 200% e temas
 
 Repita uma volta rápida pelas telas com a fonte no máximo, primeiro no tema claro e depois no escuro.
 
-- [ ] **27.** Nenhum texto fica cortado ou sobreposto. O crachá da lista passa a ficar empilhado na vertical.
-- [ ] **28.** Um nome longo (por exemplo, um de 80 caracteres) quebra em várias linhas na lista e não termina em "…". Um login longo pode terminar em "…".
-- [ ] **29.** Os dois temas ficam legíveis em todas as telas, inclusive nos diálogos, no snackbar e na tela de erro.
-- [ ] **30.** Com "Remover animações" ligado, a troca de telas acontece sem animação.
+- [x] **27.** Nenhum texto fica cortado ou sobreposto. O crachá da lista passa a ficar empilhado na vertical.
+- [x] **28.** Um nome longo (por exemplo, um de 80 caracteres) quebra em várias linhas na lista e não termina em "…". Um login longo pode terminar em "…".
+- [x] **29.** Os dois temas ficam legíveis em todas as telas, inclusive nos diálogos, no snackbar e na tela de erro.
+- [x] **30.** Com "Remover animações" ligado, a troca de telas acontece sem animação.
 
 ## 6. Screenshots
 
-Tire um print de cada tela nos dois temas, segurando Liga/Desliga + Volume para baixo. Salve em `screenshots/` com o nome `<tela>-claro.png` ou `<tela>-escuro.png`.
+Tire um print de cada tela nos dois temas, segurando Liga/Desliga + Volume para baixo. Salve em `screenshots/` com o nome `<tela>-claro.jpeg` ou `<tela>-escuro.jpeg`.
 
 | Tela ou estado | Nome do arquivo |
 |---|---|
@@ -144,6 +144,8 @@ Tire um print de cada tela nos dois temas, segurando Liga/Desliga + Volume para 
 | Confirmação com `APAGAR` | `erro-dados-apagar` |
 
 Depois dos prints, a seção "Screenshots" do README pode mostrar alguns deles.
+
+**Roteiro concluído em 24/11/2026**, num Android com o Expo Go. As capturas feitas estão em [`screenshots/`](screenshots/) e aparecem no README.
 
 ## 7. Depois do roteiro
 
