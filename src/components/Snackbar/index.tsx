@@ -28,7 +28,6 @@ export function Snackbar({ message, onDismiss, duration = 4000 }: SnackbarProps)
   return (
     <View
       pointerEvents="none"
-      accessibilityLiveRegion="polite"
       style={[
         styles.bar,
         {

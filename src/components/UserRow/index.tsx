@@ -48,7 +48,8 @@ function UserRowComponent({ row, onPress }: UserRowProps) {
 
       <View style={styles.text}>
         <View style={[styles.nameLine, { gap: space.xs }]}>
-          <Text numberOfLines={2} style={[type.body, styles.name, { color: colors.onSurface }]}>
+          {/* No line limit: names wrap and are never truncated, even at 200% font (design-shape §5). */}
+          <Text style={[type.body, styles.name, { color: colors.onSurface }]}>
             {row.name}
           </Text>
           {row.isSelf ? (

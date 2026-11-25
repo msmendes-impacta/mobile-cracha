@@ -99,7 +99,6 @@ export function LoginPage({ navigation }: Props) {
     >
       {expiredNotice ? (
         <View
-          accessibilityLiveRegion="polite"
           style={[
             styles.notice,
             { backgroundColor: colors.inverseSurface, borderRadius: 8, padding: space.md, marginBottom: space.md },
@@ -149,8 +148,8 @@ export function LoginPage({ navigation }: Props) {
         />
 
         {shownError ? (
+          // No live region: the lock countdown changes every second. Messages are announced explicitly.
           <View
-            accessibilityLiveRegion="polite"
             style={[
               styles.formError,
               { backgroundColor: colors.errorContainer, borderRadius: 8, padding: space.sm, marginBottom: space.md },
