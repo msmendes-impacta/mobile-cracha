@@ -2,6 +2,7 @@ import { normalizeUsername } from '../domain/username';
 import { hasErrors, validateUser } from '../domain/validateUser';
 import { isUserArray, toUserView, type FieldErrors, type User, type UserInput, type UserView } from '../models/user';
 import type { CryptoPort } from './crypto.port';
+import type { LoginAttemptsRepository } from './loginAttempts.repo';
 import type { PasswordService } from './password.service';
 import { readJson, STORAGE_KEYS, writeJson, type ReadResult } from './storage';
 
@@ -29,6 +30,14 @@ export class UserNotFoundError extends Error {
   }
 }
 
+/** The signed-in user tried to delete their own record (FR-018). */
+export class SelfDeleteError extends Error {
+  constructor() {
+    super('Cannot delete the signed-in user');
+    this.name = 'SelfDeleteError';
+  }
+}
+
 export type SaveUserResult = { ok: true; user: UserView } | { ok: false; errors: FieldErrors };
 
 export interface UserRepository {
@@ -40,9 +49,19 @@ export interface UserRepository {
   createUser(input: UserInput): Promise<SaveUserResult>;
   /** Edit mode: a blank password keeps the current hash and salt (FR-012 to FR-016). */
   updateUser(id: string, input: UserInput): Promise<SaveUserResult>;
+  /**
+   * Hard delete together with the username's attempt record (FR-019). Never the signed-in
+   * user (`SelfDeleteError`); a missing id is a no-op.
+   */
+  deleteUser(id: string, currentUserId: string): Promise<void>;
 }
 
-export function createUserRepository(crypto: CryptoPort, passwords: PasswordService): UserRepository {
+export function createUserRepository(
+  crypto: CryptoPort,
+  passwords: PasswordService,
+  attempts: LoginAttemptsRepository,
+  now: () => number = Date.now,
+): UserRepository {
   const loadUsers = () => readJson(STORAGE_KEYS.users, isUserArray);
 
   async function requireUsers(): Promise<User[]> {
@@ -111,6 +130,18 @@ export function createUserRepository(crypto: CryptoPort, passwords: PasswordServ
         users.map((u) => (u.id === id ? updated : u)),
       );
       return { ok: true, user: toUserView(updated) };
+    },
+    async deleteUser(id, currentUserId) {
+      if (id === currentUserId) throw new SelfDeleteError();
+      const users = await requireUsers();
+      const target = users.find((u) => u.id === id);
+      if (!target) return;
+
+      await writeJson(
+        STORAGE_KEYS.users,
+        users.filter((u) => u.id !== id),
+      );
+      await attempts.remove(target.username, now());
     },
   };
 }
