@@ -40,7 +40,14 @@ export function TextField({
   return (
     <View style={{ marginBottom: space.md }}>
       <View style={styles.labelRow}>
-        <Text style={[type.label, { color: error ? colors.error : colors.onSurfaceVariant }]}>{label}</Text>
+        {/* The input's accessibilityLabel already carries the label and the error. */}
+        <Text
+          style={[type.label, { color: error ? colors.error : colors.onSurfaceVariant }]}
+          importantForAccessibility="no"
+          accessibilityElementsHidden
+        >
+          {label}
+        </Text>
         {showCounter && maxLength ? (
           <Text
             style={[type.labelSmall, { color: colors.onSurfaceVariant }]}
@@ -104,7 +111,11 @@ export function TextField({
       </View>
 
       {error ? (
-        <View style={[styles.messageRow, { marginTop: space.half }]} accessibilityLiveRegion="polite">
+        <View
+          style={[styles.messageRow, { marginTop: space.half }]}
+          importantForAccessibility="no-hide-descendants"
+          accessibilityElementsHidden
+        >
           <MaterialCommunityIcons name="alert-circle" size={16} color={colors.error} style={styles.messageIcon} />
           <Text style={[type.bodySmall, styles.messageText, { color: colors.error }]}>{error}</Text>
         </View>

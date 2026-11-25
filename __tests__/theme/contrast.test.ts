@@ -23,6 +23,9 @@ const textPairs: Pair[] = [
   ['onSurfaceVariant', 'background'],
   ['onSurface', 'surfaceContainer'],
   ['onSurfaceVariant', 'surfaceContainer'],
+  // Dialog actions sit on surfaceContainer.
+  ['primary', 'surfaceContainer'],
+  ['error', 'surfaceContainer'],
   ['onSurface', 'badgeCard'],
   ['onSurfaceVariant', 'badgeCard'],
   ['onBadgeBand', 'badgeBand'],
@@ -46,9 +49,18 @@ const uiPairs: Pair[] = [
   ['outline', 'badgeCard'],
   ['focus', 'surface'],
   ['focus', 'background'],
+  // A focused row while pressed.
+  ['focus', 'surfaceContainer'],
   ['badgeBand', 'badgeCard'],
   ['badgeBand', 'background'],
 ];
+
+/** Pairs used in one theme only, e.g. the navy initials of the light MiniBadgeAvatar. */
+const lightOnlyTextPairs: Pair[] = [['badgeBand', 'badgeCard']];
+
+it.each(lightOnlyTextPairs)('light text %s on %s is at least 4.5:1', (fg, bg) => {
+  expect(contrast(lightColors[fg], lightColors[bg])).toBeGreaterThanOrEqual(4.5);
+});
 
 describe.each([
   ['light', lightColors],
