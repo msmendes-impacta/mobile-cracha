@@ -86,14 +86,14 @@
 
 - [x] T036 [P] [US2] `__tests__/domain/userPresentation.test.ts`: `sortUsersByName` ignores case and accents ("Álvaro" next to "Alvaro") and ties break by id; `firstName` (single word, extra spaces); `initials` ("Matheus Mendes" → "MM", "Heitor" → "H"); `userCountLabel` (1 → "1 usuário cadastrado", 4 → "4 usuários cadastrados").
 - [x] T037 [P] [US2] Implement `src/domain/userPresentation.ts` (`compareKey`, `sortUsersByName`, `firstName`, `initials`, `userCountLabel`).
-- [ ] T038 [US2] Build `src/components/SessionBadge/` per design-shape §3: horizontal compact badge with band, MiniBadgeAvatar, "Olá, <firstName>" in display size, `@USERNAME` ID-number style, count label, and a validity line slot ("Sessão válida por N min", fed in US5). One a11y element: "<name>, login <username>, <count>, sessão válida por N minutos". Reflows vertically at 200%.
-- [ ] T039 [US2] Build `src/pages/UserListPage.tsx`:
+- [x] T038 [US2] Build `src/components/SessionBadge/` per design-shape §3: horizontal compact badge with band, MiniBadgeAvatar, "Olá, <firstName>" in display size, `@USERNAME` ID-number style, count label, and a validity line slot ("Sessão válida por N min", fed in US5). One a11y element: "<name>, login <username>, <count>, sessão válida por N minutos". Reflows vertically at 200%.
+- [x] T039 [US2] Build `src/pages/UserListPage.tsx`:
   - header title "Usuários" with HeaderActions "Adicionar usuário" (account-plus → `userForm`) and "Sair" (logout → `signOut`);
   - SessionBadge on top; `FlatList` of 72 dp rows (MiniBadgeAvatar, name wrapping to 2 lines, username as ID number with ellipsis);
   - "você" tag on the current user; each row is one a11y element with the hint "Toque duas vezes para editar";
   - pressed and focus states (tonal elevation plus 3:1 outline);
   - refresh on `focus`; the single-user empty hint.
-- [ ] T040 [US2] Register `users` and `userForm` in `src/navigation/PrivateStack.tsx`. After the first-user signup or a sign-in, land on `users`.
+- [x] T040 [US2] Register `users` and `userForm` in `src/navigation/PrivateStack.tsx`. After the first-user signup or a sign-in, land on `users`.
 
 **Checkpoint**: quickstart #2 and #3 (display part) pass.
 
