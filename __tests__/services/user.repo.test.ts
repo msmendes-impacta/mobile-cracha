@@ -7,6 +7,7 @@ import {
   CorruptDataError,
   createUserRepository,
   FirstUserNotAllowedError,
+  UserNotFoundError,
 } from '../../src/services/user.repo';
 import { createNodeCryptoAdapter } from '../helpers/nodeCrypto.adapter';
 
@@ -99,5 +100,85 @@ describe('createUser', () => {
   it('refuses to write on top of corrupt data', async () => {
     await AsyncStorage.setItem(STORAGE_KEYS.users, '[{"id":1}]');
     await expect(repo.createUser(nicoli)).rejects.toBeInstanceOf(CorruptDataError);
+  });
+});
+
+describe('updateUser (edit mode, FR-012 to FR-016)', () => {
+  const storedUsers = async () => JSON.parse((await AsyncStorage.getItem(STORAGE_KEYS.users)) ?? '[]');
+
+  async function seed() {
+    const first = await repo.createFirstUser(matheus);
+    const second = await repo.createUser(nicoli);
+    if (!first.ok || !second.ok) throw new Error('seed failed');
+    return { matheusId: first.user.id, nicoliId: second.user.id };
+  }
+
+  it('updates name and username and keeps the hash and salt when the password is blank', async () => {
+    const { nicoliId } = await seed();
+    const before = (await storedUsers()).find((u: { id: string }) => u.id === nicoliId);
+
+    const result = await repo.updateUser(nicoliId, {
+      name: ' Nicoli F. Souza ',
+      username: ' NICOLI ',
+      password: '',
+      confirmPassword: '',
+    });
+
+    expect(result).toEqual({ ok: true, user: { id: nicoliId, name: 'Nicoli F. Souza', username: 'nicoli' } });
+    const after = (await storedUsers()).find((u: { id: string }) => u.id === nicoliId);
+    expect(after.passwordHash).toBe(before.passwordHash);
+    expect(after.salt).toBe(before.salt);
+  });
+
+  it('regenerates the salt and hash when a new password is given, and the new one verifies', async () => {
+    const { nicoliId } = await seed();
+    const before = (await storedUsers()).find((u: { id: string }) => u.id === nicoliId);
+
+    const result = await repo.updateUser(nicoliId, { ...nicoli, password: 'nova-senha', confirmPassword: 'nova-senha' });
+
+    expect(result.ok).toBe(true);
+    const after = (await storedUsers()).find((u: { id: string }) => u.id === nicoliId);
+    expect(after.salt).not.toBe(before.salt);
+    expect(after.passwordHash).not.toBe(before.passwordHash);
+    await expect(passwords.verifyPassword('nova-senha', after.salt, after.passwordHash)).resolves.toBe(true);
+    await expect(passwords.verifyPassword('outra123', after.salt, after.passwordHash)).resolves.toBe(false);
+    expect(JSON.stringify(await storedUsers())).not.toContain('nova-senha');
+  });
+
+  it("allows keeping the user's own current username", async () => {
+    const { matheusId } = await seed();
+    const result = await repo.updateUser(matheusId, { ...matheus, password: '', confirmPassword: '' });
+    expect(result.ok).toBe(true);
+  });
+
+  it("rejects another user's username in any case or spacing", async () => {
+    const { nicoliId } = await seed();
+    const result = await repo.updateUser(nicoliId, { ...nicoli, username: '  MaTheus ', password: '', confirmPassword: '' });
+    expect(result).toEqual({ ok: false, errors: { username: MESSAGES.usernameTaken } });
+    expect((await storedUsers()).find((u: { id: string }) => u.id === nicoliId).username).toBe('nicoli.f');
+  });
+
+  it('rejects invalid input without writing', async () => {
+    const { nicoliId } = await seed();
+    const before = await AsyncStorage.getItem(STORAGE_KEYS.users);
+    const result = await repo.updateUser(nicoliId, { ...nicoli, name: 'N', password: '123', confirmPassword: '123' });
+    expect(result).toEqual({ ok: false, errors: { name: MESSAGES.nameLength, password: MESSAGES.passwordLength } });
+    expect(await AsyncStorage.getItem(STORAGE_KEYS.users)).toBe(before);
+  });
+
+  it('throws UserNotFoundError for a missing id', async () => {
+    await seed();
+    await expect(repo.updateUser('missing', { ...nicoli })).rejects.toBeInstanceOf(UserNotFoundError);
+  });
+
+  it('never changes the id and keeps the other users and their order', async () => {
+    const { matheusId, nicoliId } = await seed();
+    await repo.updateUser(nicoliId, { ...nicoli, name: 'Outro Nome', password: '', confirmPassword: '' });
+    expect((await storedUsers()).map((u: { id: string }) => u.id)).toEqual([matheusId, nicoliId]);
+  });
+
+  it('refuses to write on top of corrupt data', async () => {
+    await AsyncStorage.setItem(STORAGE_KEYS.users, '{');
+    await expect(repo.updateUser('any', nicoli)).rejects.toBeInstanceOf(CorruptDataError);
   });
 });
