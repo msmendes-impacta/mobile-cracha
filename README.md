@@ -110,7 +110,7 @@ Meta: WCAG 2.2 AA.
 - [x] Partes decorativas do crachá (presilha, código de barras, prévia, mini crachá) ficam ocultas do TalkBack.
 - [x] O crachá se reorganiza na vertical com fonte grande, e nomes longos quebram linha em vez de serem cortados.
 - [x] Transições desligadas quando o aparelho pede para reduzir movimento.
-- [ ] Verificação no aparelho com TalkBack, fonte em 200% e os dois temas (passo 12 do roteiro).
+- [x] Verificação no aparelho com TalkBack, fonte em 200% e os dois temas (passo 12 do roteiro).
 
 ### Contraste medido
 
@@ -143,7 +143,21 @@ Razões calculadas a partir de `src/theme/tokens.ts`, com a fórmula de luminân
 
 ## Screenshots
 
-As capturas das telas nos temas claro e escuro vão ficar em [`screenshots/`](screenshots/).
+Capturas feitas num Android com o Expo Go, no tema escuro. Todas estão em [`screenshots/`](screenshots/).
+
+| Primeiro acesso | Novo usuário | Lista |
+|---|---|---|
+| <img src="screenshots/login-primeiro-acesso-escuro.jpeg" width="220" alt="Login com o botão Criar primeiro usuário"> | <img src="screenshots/novo-usuario-escuro.jpeg" width="220" alt="Formulário de novo usuário preenchido"> | <img src="screenshots/lista-usuario-salvo-escuro.jpeg" width="220" alt="Lista com dois usuários e o aviso Usuário salvo"> |
+
+| Login inválido | Login bloqueado | Confirmação de exclusão |
+|---|---|---|
+| <img src="screenshots/login-erro-escuro.jpeg" width="220" alt="Login com a mensagem Login ou senha inválidos"> | <img src="screenshots/login-bloqueado-escuro.jpeg" width="220" alt="Login bloqueado por muitas tentativas"> | <img src="screenshots/excluir-confirmacao-escuro.jpeg" width="220" alt="Diálogo Excluir Nicoli Ferreira?"> |
+
+| Só você na lista | Aviso de sessão | Sessão expirada |
+|---|---|---|
+| <img src="screenshots/lista-so-voce-escuro.jpeg" width="220" alt="Lista só com o usuário atual e a dica para cadastrar outra pessoa"> | <img src="screenshots/aviso-sessao-escuro.jpeg" width="220" alt="Diálogo Você ainda está aí?"> | <img src="screenshots/login-sessao-expirada-escuro.jpeg" width="220" alt="Login com o aviso de sessão expirada por inatividade"> |
+
+O botão redondo com a engrenagem que aparece nas capturas é o menu de desenvolvimento do Expo Go, não faz parte do app.
 
 ## Entrega
 
