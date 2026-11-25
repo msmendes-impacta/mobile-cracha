@@ -152,8 +152,8 @@
 
 ## Phase 8: Data error and reset (cross-cutting, spec §Clarifications, FR-031)
 
-- [ ] T057 [P] `__tests__/services/user.repo.test.ts` (corrupt part): the corrupt users key never yields `absent`; `resetAll` then `loadUsers` → `absent`.
-- [ ] T058 Build `src/components/TypedConfirmDialog/` (requires typing `APAGAR` exactly, case-sensitive; the confirm button is disabled until it matches; Cancelar keeps the current state) and `src/pages/DataErrorPage.tsx` (icon, explanation, destructive tonal button "Apagar dados e recomeçar" → `resetAllData()` → status `signedOut` with users absent).
+- [x] T057 [P] `__tests__/services/user.repo.test.ts` (corrupt part): the corrupt users key never yields `absent`; `resetAll` then `loadUsers` → `absent`.
+- [x] T058 Build `src/components/TypedConfirmDialog/` (requires typing `APAGAR` exactly, case-sensitive; the confirm button is disabled until it matches; Cancelar keeps the current state) and `src/pages/DataErrorPage.tsx` (icon, explanation, destructive tonal button "Apagar dados e recomeçar" → `resetAllData()` → status `signedOut` with users absent).
 
 ---
 

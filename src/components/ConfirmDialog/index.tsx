@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { KeyboardAvoidingView, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { useTheme } from '../../theme/useTheme';
 
@@ -12,6 +12,8 @@ export interface ConfirmDialogProps {
   /** Renders the confirm action in the error color (deletion, reset). */
   destructive?: boolean;
   confirmDisabled?: boolean;
+  /** While the confirmed action runs. */
+  cancelDisabled?: boolean;
   onConfirm: () => void;
   onCancel: () => void;
   /** System Back. Defaults to `onCancel`. */
@@ -29,6 +31,7 @@ export function ConfirmDialog({
   cancelLabel = 'Cancelar',
   destructive,
   confirmDisabled,
+  cancelDisabled,
   onConfirm,
   onCancel,
   onRequestClose = onCancel,
@@ -53,7 +56,11 @@ export function ConfirmDialog({
 
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onRequestClose} statusBarTranslucent>
-      <View style={[styles.scrim, { backgroundColor: colors.scrim, padding: space.lg }]}>
+      {/* Keeps a typed-confirmation field above the keyboard. */}
+      <KeyboardAvoidingView
+        behavior="padding"
+        style={[styles.scrim, { backgroundColor: colors.scrim, padding: space.lg }]}
+      >
         <View
           accessibilityViewIsModal
           style={[
@@ -69,11 +76,11 @@ export function ConfirmDialog({
           ) : null}
           {children ? <View style={{ marginTop: space.md }}>{children}</View> : null}
           <View style={[styles.actions, { marginTop: space.lg, gap: space.xs }]}>
-            {action(cancelLabel, colors.primary, onCancel)}
+            {action(cancelLabel, colors.primary, onCancel, cancelDisabled)}
             {action(confirmLabel, confirmColor, onConfirm, confirmDisabled)}
           </View>
         </View>
-      </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }
