@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 
-import type { UserInput } from '../models/user';
+import type { UserInput, UserView } from '../models/user';
 import type { SignInResult } from '../services/auth.service';
 import { createAppServices } from '../services/container';
 import { expoCryptoAdapter } from '../services/expoCrypto.adapter';
@@ -17,6 +17,10 @@ export interface SessionContextValue {
   userId?: string;
   signIn(username: string, password: string): Promise<SignInResult>;
   createFirstUser(input: UserInput): Promise<SaveUserResult>;
+  /** Users without credentials, for the list screen (FR-030). Corrupt data fails closed. */
+  listUsers(): Promise<UserView[]>;
+  /** Signed-in creation of another user. */
+  createUser(input: UserInput): Promise<SaveUserResult>;
   signOut(): Promise<void>;
 }
 
@@ -94,14 +98,35 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     [startSession, failClosed],
   );
 
+  const listUsers = useCallback(async (): Promise<UserView[]> => {
+    try {
+      return await services.users.listUserViews();
+    } catch {
+      failClosed();
+      return [];
+    }
+  }, [failClosed]);
+
+  const createUser = useCallback(
+    async (input: UserInput): Promise<SaveUserResult> => {
+      try {
+        return await services.users.createUser(input);
+      } catch {
+        failClosed();
+        return { ok: false, errors: {} };
+      }
+    },
+    [failClosed],
+  );
+
   const signOut = useCallback(async () => {
     await clearSession();
     setState({ status: 'signedOut', usersExist: true });
   }, []);
 
   const value = useMemo<SessionContextValue>(
-    () => ({ ...state, signIn, createFirstUser, signOut }),
-    [state, signIn, createFirstUser, signOut],
+    () => ({ ...state, signIn, createFirstUser, listUsers, createUser, signOut }),
+    [state, signIn, createFirstUser, listUsers, createUser, signOut],
   );
 
   return <SessionContext.Provider value={value}>{children}</SessionContext.Provider>;
