@@ -124,9 +124,9 @@
 **Goal**: delete other users with confirmation; never yourself.
 **Independent test**: quickstart #5, #6.
 
-- [ ] T046 [P] [US4] Extend `__tests__/services/user.repo.test.ts`: `deleteUser` removes the record **and the username's attempt record** (FR-019); self-delete throws `SelfDeleteError`; deleting a missing id is a no-op; a deleted user cannot sign in (`auth.service` → `invalid`).
-- [ ] T047 [US4] Implement `deleteUser` in `src/services/user.repo.ts` (uses `loginAttempts.repo` to drop the record).
-- [ ] T048 [US4] Add "Excluir" to `src/pages/UserFormPage.tsx` (edit mode, not shown when `id === currentUserId`): destructive text and icon, ConfirmDialog "Excluir <nome>?" naming the user, Snackbar "Usuário excluído", disabled while deleting.
+- [x] T046 [P] [US4] Extend `__tests__/services/user.repo.test.ts`: `deleteUser` removes the record **and the username's attempt record** (FR-019); self-delete throws `SelfDeleteError`; deleting a missing id is a no-op; a deleted user cannot sign in (`auth.service` → `invalid`).
+- [x] T047 [US4] Implement `deleteUser` in `src/services/user.repo.ts` (uses `loginAttempts.repo` to drop the record).
+- [x] T048 [US4] Add "Excluir" to `src/pages/UserFormPage.tsx` (edit mode, not shown when `id === currentUserId`): destructive text and icon, ConfirmDialog "Excluir <nome>?" naming the user, Snackbar "Usuário excluído", disabled while deleting.
 
 **Checkpoint**: quickstart #5 and #6 pass.
 
