@@ -3,13 +3,14 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-import { SessionProvider } from './src/contexts/SessionContext';
+import { SessionProvider, useSession } from './src/contexts/SessionContext';
 import { SnackbarProvider } from './src/contexts/SnackbarContext';
 import { RootNavigator } from './src/navigation/RootNavigator';
 import { useTheme } from './src/theme/useTheme';
 
 function AppShell() {
   const theme = useTheme();
+  const { recordActivity } = useSession();
   const base = theme.dark ? DarkTheme : DefaultTheme;
   const navTheme: NavTheme = {
     ...base,
@@ -25,10 +26,10 @@ function AppShell() {
   };
 
   return (
-    // Root view: touch activity is wired to the session controller in US5 (T054).
-    <View style={[styles.root, { backgroundColor: theme.colors.background }]}>
+    // Any touch or screen change counts as activity for the inactivity timeout (FR-021).
+    <View style={[styles.root, { backgroundColor: theme.colors.background }]} onTouchStart={recordActivity}>
       <SnackbarProvider>
-        <NavigationContainer theme={navTheme}>
+        <NavigationContainer theme={navTheme} onStateChange={recordActivity}>
           <RootNavigator />
         </NavigationContainer>
       </SnackbarProvider>

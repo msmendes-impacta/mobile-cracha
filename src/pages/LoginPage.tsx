@@ -14,13 +14,14 @@ import { useTheme } from '../theme/useTheme';
 type Props = NativeStackScreenProps<PublicStackParamList, 'login'>;
 
 const INVALID_MESSAGE = 'Login ou senha inválidos.';
+const EXPIRED_MESSAGE = 'Sua sessão expirou por inatividade. Entre novamente.';
 const lockMessage = (seconds: number) =>
   `Muitas tentativas. Tente novamente em ${seconds} ${seconds === 1 ? 'segundo' : 'segundos'}.`;
 
 export function LoginPage({ navigation }: Props) {
   const { colors, type, space } = useTheme();
   const insets = useSafeAreaInsets();
-  const { signIn, usersExist } = useSession();
+  const { signIn, usersExist, expiredNotice } = useSession();
 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -48,6 +49,11 @@ export function LoginPage({ navigation }: Props) {
     const timer = setInterval(tick, 1000);
     return () => clearInterval(timer);
   }, [lockedUntil]);
+
+  // The login replaced the signed-in screens; say why (FR-024).
+  useEffect(() => {
+    if (expiredNotice) AccessibilityInfo.announceForAccessibility(EXPIRED_MESSAGE);
+  }, [expiredNotice]);
 
   const locked = lockedUntil !== null && lockSeconds > 0;
   const shownError = locked ? lockMessage(lockSeconds) : formError;
@@ -91,6 +97,21 @@ export function LoginPage({ navigation }: Props) {
       ]}
       keyboardShouldPersistTaps="handled"
     >
+      {expiredNotice ? (
+        <View
+          accessibilityLiveRegion="polite"
+          style={[
+            styles.notice,
+            { backgroundColor: colors.inverseSurface, borderRadius: 8, padding: space.md, marginBottom: space.md },
+          ]}
+        >
+          <MaterialCommunityIcons name="timer-sand-complete" size={20} color={colors.inverseOnSurface} />
+          <Text style={[type.bodySmall, styles.formErrorText, { color: colors.inverseOnSurface }]}>
+            {EXPIRED_MESSAGE}
+          </Text>
+        </View>
+      ) : null}
+
       <Badge>
         <TextField
           ref={usernameRef}
@@ -175,6 +196,7 @@ export function LoginPage({ navigation }: Props) {
 const styles = StyleSheet.create({
   content: { flexGrow: 1, justifyContent: 'center' },
   formError: { flexDirection: 'row', alignItems: 'flex-start', gap: 8 },
+  notice: { flexDirection: 'row', alignItems: 'center', gap: 12, width: '100%', maxWidth: 420, alignSelf: 'center' },
   formErrorText: { flex: 1 },
   centered: { textAlign: 'center' },
 });

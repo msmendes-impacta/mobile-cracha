@@ -14,6 +14,8 @@ export interface ConfirmDialogProps {
   confirmDisabled?: boolean;
   onConfirm: () => void;
   onCancel: () => void;
+  /** System Back. Defaults to `onCancel`. */
+  onRequestClose?: () => void;
   /** Extra content, e.g. the typed-confirmation field. */
   children?: ReactNode;
 }
@@ -29,6 +31,7 @@ export function ConfirmDialog({
   confirmDisabled,
   onConfirm,
   onCancel,
+  onRequestClose = onCancel,
   children,
 }: ConfirmDialogProps) {
   const { colors, type, space, radius, minTouchTarget } = useTheme();
@@ -49,7 +52,7 @@ export function ConfirmDialog({
   );
 
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onCancel} statusBarTranslucent>
+    <Modal visible={visible} transparent animationType="fade" onRequestClose={onRequestClose} statusBarTranslucent>
       <View style={[styles.scrim, { backgroundColor: colors.scrim, padding: space.lg }]}>
         <View
           accessibilityViewIsModal
