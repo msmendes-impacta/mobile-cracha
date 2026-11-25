@@ -1,19 +1,24 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { MESSAGES } from '../../src/domain/validateUser';
+import { createAppServices } from '../../src/services/container';
+import { createLoginAttemptsRepository } from '../../src/services/loginAttempts.repo';
 import { createPasswordService } from '../../src/services/password.service';
 import { STORAGE_KEYS } from '../../src/services/storage';
 import {
   CorruptDataError,
   createUserRepository,
   FirstUserNotAllowedError,
+  SelfDeleteError,
   UserNotFoundError,
 } from '../../src/services/user.repo';
 import { createNodeCryptoAdapter } from '../helpers/nodeCrypto.adapter';
 
 const crypto = createNodeCryptoAdapter();
 const passwords = createPasswordService(crypto);
-const repo = createUserRepository(crypto, passwords);
+const T0 = 1_700_000_000_000;
+const attempts = createLoginAttemptsRepository();
+const repo = createUserRepository(crypto, passwords, attempts, () => T0);
 
 const matheus = { name: ' Matheus Mendes ', username: ' Matheus ', password: 'senha123', confirmPassword: 'senha123' };
 const nicoli = { name: 'Nicoli Ferreira', username: 'nicoli.f', password: 'outra123', confirmPassword: 'outra123' };
@@ -180,5 +185,68 @@ describe('updateUser (edit mode, FR-012 to FR-016)', () => {
   it('refuses to write on top of corrupt data', async () => {
     await AsyncStorage.setItem(STORAGE_KEYS.users, '{');
     await expect(repo.updateUser('any', nicoli)).rejects.toBeInstanceOf(CorruptDataError);
+  });
+});
+
+describe('deleteUser (FR-018, FR-019)', () => {
+  const failing = { failures: 2, lockouts: 0, lockedUntil: null };
+
+  async function seed() {
+    const first = await repo.createFirstUser(matheus);
+    const second = await repo.createUser(nicoli);
+    if (!first.ok || !second.ok) throw new Error('seed failed');
+    return { matheusId: first.user.id, nicoliId: second.user.id };
+  }
+
+  it("removes the user and only that username's attempt record", async () => {
+    const { matheusId, nicoliId } = await seed();
+    await attempts.save('nicoli.f', failing, T0);
+    await attempts.save('matheus', failing, T0);
+
+    await repo.deleteUser(nicoliId, matheusId);
+
+    await expect(repo.listUserViews()).resolves.toEqual([
+      { id: matheusId, name: 'Matheus Mendes', username: 'matheus' },
+    ]);
+    await expect(attempts.load()).resolves.toEqual({ matheus: failing });
+  });
+
+  it('refuses to delete the signed-in user and changes nothing', async () => {
+    const { matheusId } = await seed();
+    const before = await AsyncStorage.getItem(STORAGE_KEYS.users);
+    await expect(repo.deleteUser(matheusId, matheusId)).rejects.toBeInstanceOf(SelfDeleteError);
+    expect(await AsyncStorage.getItem(STORAGE_KEYS.users)).toBe(before);
+  });
+
+  it('is a no-op for a missing id, including the attempt records', async () => {
+    const { matheusId } = await seed();
+    await attempts.save('nicoli.f', failing, T0);
+    const before = await AsyncStorage.getItem(STORAGE_KEYS.users);
+
+    await expect(repo.deleteUser('missing', matheusId)).resolves.toBeUndefined();
+
+    expect(await AsyncStorage.getItem(STORAGE_KEYS.users)).toBe(before);
+    await expect(attempts.load()).resolves.toEqual({ 'nicoli.f': failing });
+  });
+
+  it('refuses to write on top of corrupt data', async () => {
+    await AsyncStorage.setItem(STORAGE_KEYS.users, '{');
+    await expect(repo.deleteUser('any', 'me')).rejects.toBeInstanceOf(CorruptDataError);
+    expect(await AsyncStorage.getItem(STORAGE_KEYS.users)).toBe('{');
+  });
+
+  it('leaves a deleted user unable to sign in (same "invalid" result)', async () => {
+    const s = createAppServices(createNodeCryptoAdapter());
+    const first = await s.users.createFirstUser(matheus);
+    const second = await s.users.createUser(nicoli);
+    if (!first.ok || !second.ok) throw new Error('seed failed');
+    await expect(s.auth.signIn('nicoli.f', 'outra123', T0)).resolves.toEqual({
+      status: 'ok',
+      userId: second.user.id,
+    });
+
+    await s.users.deleteUser(second.user.id, first.user.id);
+
+    await expect(s.auth.signIn('nicoli.f', 'outra123', T0)).resolves.toEqual({ status: 'invalid' });
   });
 });

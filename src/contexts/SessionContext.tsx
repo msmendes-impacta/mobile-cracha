@@ -7,6 +7,7 @@ import { expoCryptoAdapter } from '../services/expoCrypto.adapter';
 import {
   CorruptDataError,
   FirstUserNotAllowedError,
+  SelfDeleteError,
   UserNotFoundError,
   type SaveUserResult,
 } from '../services/user.repo';
@@ -30,6 +31,8 @@ export interface SessionContextValue {
   getUser(id: string): Promise<UserView | undefined>;
   /** Edit; resolves to `notFound` when the user was removed meanwhile. */
   updateUser(id: string, input: UserInput): Promise<SaveUserResult | { ok: false; notFound: true }>;
+  /** Deletes another user (FR-018); false when refused (own record or no session). */
+  deleteUser(id: string): Promise<boolean>;
   signOut(): Promise<void>;
 }
 
@@ -153,14 +156,30 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     [failClosed],
   );
 
+  const { userId } = state;
+  const deleteUser = useCallback(
+    async (id: string): Promise<boolean> => {
+      if (!userId) return false;
+      try {
+        await services.users.deleteUser(id, userId);
+        return true;
+      } catch (error) {
+        if (error instanceof SelfDeleteError) return false;
+        failClosed();
+        return false;
+      }
+    },
+    [userId, failClosed],
+  );
+
   const signOut = useCallback(async () => {
     await clearSession();
     setState({ status: 'signedOut', usersExist: true });
   }, []);
 
   const value = useMemo<SessionContextValue>(
-    () => ({ ...state, signIn, createFirstUser, listUsers, createUser, getUser, updateUser, signOut }),
-    [state, signIn, createFirstUser, listUsers, createUser, getUser, updateUser, signOut],
+    () => ({ ...state, signIn, createFirstUser, listUsers, createUser, getUser, updateUser, deleteUser, signOut }),
+    [state, signIn, createFirstUser, listUsers, createUser, getUser, updateUser, deleteUser, signOut],
   );
 
   return <SessionContext.Provider value={value}>{children}</SessionContext.Provider>;
