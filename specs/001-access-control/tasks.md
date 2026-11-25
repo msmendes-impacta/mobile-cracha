@@ -161,17 +161,21 @@
 
 **Goal**: verify and finish the cross-cutting design and a11y requirements on every screen.
 
-- [ ] T059 [US6] Contrast pass: compute the ratios for every text/background and UI/background pair in both themes from `src/theme/tokens.ts` (targets 4.5:1 text, 3:1 UI) and fix tokens that fail. Record the results in a "Contraste medido" table in `README.md` (the approved design-shape stays unchanged).
+- [x] T059 [US6] Contrast pass: compute the ratios for every text/background and UI/background pair in both themes from `src/theme/tokens.ts` (targets 4.5:1 text, 3:1 UI) and fix tokens that fail. Record the results in a "Contraste medido" table in `README.md` (the approved design-shape stays unchanged).
 - [ ] T060 [US6] TalkBack pass on all screens and dialogs (labels, roles, row grouping, announcements, focus to the first error); fix the findings in the affected components.
+  - Code audit done 2026-11-24 (live regions removed from the login error/notice and the snackbar, duplicate TextField label and error hidden). Pending: on-device TalkBack pass (no Android SDK on the dev machine).
 - [ ] T061 [US6] Font-scale 200% and dark/light pass on a device or emulator (`adb shell settings put system font_scale 2.0`, `adb shell cmd uimode night yes|no`); fix clipping.
+  - Code audit done 2026-11-24 (user row name no longer limited to 2 lines). Pending: on-device check at 200% font and in both themes.
 - [ ] T062 [P] Write `README.md` sections (in pt-BR):
   - Como executar; Como testar (`npm test`, coverage);
   - Roteiro de demonstração (quickstart manual table);
   - Decisões e limitações (SHA-256 + salt vs bcrypt, local data only, inactivity expiry, accepted risks from the spec Assumptions);
   - Checklist de acessibilidade;
   - Screenshots (light and dark) in `screenshots/`.
+  - All sections written 2026-11-24 except the screenshots, which wait for T063.
 - [ ] T063 [P] Capture screenshots of all screens in both themes via `adb exec-out screencap -p` into `screenshots/`.
-- [ ] T064 Run `npm test`, `npm run lint`, `npm run typecheck`, `npm audit --omit=dev` (no high or critical), and record the results in `docs/fluxo-status.md`.
+  - Pending: needs a device or emulator.
+- [x] T064 Run `npm test`, `npm run lint`, `npm run typecheck`, `npm audit --omit=dev` (no high or critical), and record the results in `docs/fluxo-status.md`.
 
 ---
 
