@@ -104,11 +104,11 @@
 **Goal**: signed-in create and edit with optional password on edit, uniqueness, and the discard prompt.
 **Independent test**: create, edit name and login, keep and change the password, verify via sign-in (quickstart #3, #4, #9).
 
-- [ ] T041 [P] [US3] Extend `__tests__/services/user.repo.test.ts` (edit part): edit keeps the hash and salt when the password is blank; a new password regenerates the salt and hash; a username change to the user's own current value is allowed; a change to another user's username (any case or spacing) → `usernameTaken`; editing a missing id → error; the id never changes.
-- [ ] T042 [P] [US3] `__tests__/domain/formDirty.test.ts`: identical → false; any field changed → true; changed then reverted → false; whitespace-only change in name counts as changed.
-- [ ] T043 [P] [US3] Implement `src/domain/formDirty.ts` (`isFormDirty`).
-- [ ] T044 [US3] Extend `saveUser` in `src/services/user.repo.ts` for edit mode (FR-012 to FR-016).
-- [ ] T045 [US3] Extend `src/pages/UserFormPage.tsx` for the private `userForm` route:
+- [x] T041 [P] [US3] Extend `__tests__/services/user.repo.test.ts` (edit part): edit keeps the hash and salt when the password is blank; a new password regenerates the salt and hash; a username change to the user's own current value is allowed; a change to another user's username (any case or spacing) → `usernameTaken`; editing a missing id → error; the id never changes.
+- [x] T042 [P] [US3] `__tests__/domain/formDirty.test.ts`: identical → false; any field changed → true; changed then reverted → false; whitespace-only change in name counts as changed.
+- [x] T043 [P] [US3] Implement `src/domain/formDirty.ts` (`isFormDirty`).
+- [x] T044 [US3] Extend `saveUser` in `src/services/user.repo.ts` for edit mode (FR-012 to FR-016).
+- [x] T045 [US3] Extend `src/pages/UserFormPage.tsx` for the private `userForm` route:
   - title "Novo Usuário" / "Editar Usuário"; prefill on edit;
   - password hint "Deixe em branco para manter a senha atual";
   - Snackbar "Usuário salvo" on return;

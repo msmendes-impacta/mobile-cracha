@@ -21,6 +21,14 @@ export class FirstUserNotAllowedError extends Error {
   }
 }
 
+/** The user being edited no longer exists. */
+export class UserNotFoundError extends Error {
+  constructor() {
+    super('User not found');
+    this.name = 'UserNotFoundError';
+  }
+}
+
 export type SaveUserResult = { ok: true; user: UserView } | { ok: false; errors: FieldErrors };
 
 export interface UserRepository {
@@ -30,6 +38,8 @@ export interface UserRepository {
   getById(id: string): Promise<UserView | undefined>;
   createFirstUser(input: UserInput): Promise<SaveUserResult>;
   createUser(input: UserInput): Promise<SaveUserResult>;
+  /** Edit mode: a blank password keeps the current hash and salt (FR-012 to FR-016). */
+  updateUser(id: string, input: UserInput): Promise<SaveUserResult>;
 }
 
 export function createUserRepository(crypto: CryptoPort, passwords: PasswordService): UserRepository {
@@ -75,6 +85,32 @@ export function createUserRepository(crypto: CryptoPort, passwords: PasswordServ
     },
     async createUser(input) {
       return insert(input, await requireUsers());
+    },
+    async updateUser(id, input) {
+      const users = await requireUsers();
+      const current = users.find((u) => u.id === id);
+      if (!current) throw new UserNotFoundError();
+
+      // Re-validated against fresh data, like create (FR-016).
+      const errors = validateUser(input, { kind: 'edit', id }, users);
+      if (hasErrors(errors)) return { ok: false, errors };
+
+      // A new password always gets a new salt; a blank one keeps both (FR-012).
+      const credentials =
+        input.password.length > 0
+          ? await passwords.createPasswordHash(input.password)
+          : { salt: current.salt, passwordHash: current.passwordHash };
+      const updated: User = {
+        id: current.id,
+        name: input.name.trim(),
+        username: normalizeUsername(input.username),
+        ...credentials,
+      };
+      await writeJson(
+        STORAGE_KEYS.users,
+        users.map((u) => (u.id === id ? updated : u)),
+      );
+      return { ok: true, user: toUserView(updated) };
     },
   };
 }

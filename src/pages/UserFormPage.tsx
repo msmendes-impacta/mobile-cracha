@@ -1,13 +1,19 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { StyleSheet, Text, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 
+import { useDiscardPrompt } from '../components/DiscardPrompt';
 import { UserForm } from '../components/UserForm';
 import { useSession } from '../contexts/SessionContext';
+import { useSnackbar } from '../contexts/SnackbarContext';
+import { isFormDirty } from '../domain/formDirty';
 import type { UserInput } from '../models/user';
 import type { PrivateStackParamList } from '../navigation/types';
 import { useTheme } from '../theme/useTheme';
 
 const EMPTY: UserInput = { name: '', username: '', password: '', confirmPassword: '' };
+
+const USER_GONE = 'Este usuário não existe mais.';
 
 /**
  * First access (public `firstUser` route, FR-001): creates the first user and signs them in.
@@ -15,55 +21,96 @@ const EMPTY: UserInput = { name: '', username: '', password: '', confirmPassword
 export function FirstUserPage() {
   const { colors, type, space } = useTheme();
   const { createFirstUser } = useSession();
+  const [current, setCurrent] = useState<UserInput>(EMPTY);
+  const discardPrompt = useDiscardPrompt(isFormDirty(EMPTY, current));
 
   return (
-    <UserForm
-      initial={EMPTY}
-      onSubmit={createFirstUser}
-      intro={
-        <Text style={[type.body, { color: colors.onSurfaceVariant, marginBottom: space.lg }]}>
-          Crie o primeiro usuário para começar a usar o Crachá. Depois, só quem estiver conectado poderá
-          cadastrar novas pessoas.
-        </Text>
-      }
-    />
+    <>
+      <UserForm
+        initial={EMPTY}
+        onChange={setCurrent}
+        onSubmit={createFirstUser}
+        intro={
+          <Text style={[type.body, { color: colors.onSurfaceVariant, marginBottom: space.lg }]}>
+            Crie o primeiro usuário para começar a usar o Crachá. Depois, só quem estiver conectado poderá
+            cadastrar novas pessoas.
+          </Text>
+        }
+      />
+      {discardPrompt}
+    </>
   );
 }
 
 type UserFormProps = NativeStackScreenProps<PrivateStackParamList, 'userForm'>;
 
 /**
- * Signed-in create/edit route (`userForm`). Create works now; edit mode, the saved snackbar
- * and the discard prompt arrive in US3 (T044, T045).
+ * Signed-in create and edit (`userForm`, FR-012): one screen, prefilled on edit, where a blank
+ * password keeps the current one. Leaving with unsaved changes asks first (FR-012a).
  */
 export function UserFormPage({ navigation, route }: UserFormProps) {
-  const { colors, type, space } = useTheme();
-  const { createUser } = useSession();
+  const { colors } = useTheme();
+  const { createUser, getUser, updateUser } = useSession();
+  const { showSnackbar } = useSnackbar();
   const editingId = route.params?.id;
 
-  if (editingId) {
+  /** What the form opened with; null while the user to edit is loading. */
+  const [initial, setInitial] = useState<UserInput | null>(editingId ? null : EMPTY);
+  const [current, setCurrent] = useState<UserInput>(EMPTY);
+  /** Set once the screen may close without asking (saved, or the user is gone). */
+  const [leaveMessage, setLeaveMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!editingId) return;
+    let active = true;
+    getUser(editingId).then((user) => {
+      if (!active) return;
+      if (!user) {
+        setLeaveMessage(USER_GONE);
+        return;
+      }
+      const loaded = { name: user.name, username: user.username, password: '', confirmPassword: '' };
+      setInitial(loaded);
+      setCurrent(loaded);
+    });
+    return () => {
+      active = false;
+    };
+  }, [editingId, getUser]);
+
+  const dirty = leaveMessage === null && initial !== null && isFormDirty(initial, current);
+  const discardPrompt = useDiscardPrompt(dirty);
+
+  // Leave only after the render that turned the discard guard off.
+  useEffect(() => {
+    if (leaveMessage === null) return;
+    showSnackbar(leaveMessage);
+    navigation.goBack();
+  }, [leaveMessage, navigation, showSnackbar]);
+
+  async function save(input: UserInput) {
+    const result = editingId ? await updateUser(editingId, input) : await createUser(input);
+    if (result.ok) setLeaveMessage('Usuário salvo');
+    else if ('notFound' in result) setLeaveMessage(USER_GONE);
+    return result.ok ? result : { ok: false, errors: 'errors' in result ? result.errors : {} };
+  }
+
+  if (initial === null) {
     return (
-      <View style={[styles.center, { backgroundColor: colors.background, padding: space.lg }]}>
-        <Text style={[type.body, styles.centerText, { color: colors.onSurfaceVariant }]}>
-          A edição de usuários chega na próxima fase.
-        </Text>
+      <View style={[styles.center, { backgroundColor: colors.background }]}>
+        <ActivityIndicator color={colors.primary} size="large" accessibilityLabel="Carregando usuário" />
       </View>
     );
   }
 
   return (
-    <UserForm
-      initial={EMPTY}
-      onSubmit={async (input) => {
-        const result = await createUser(input);
-        if (result.ok) navigation.goBack();
-        return result;
-      }}
-    />
+    <>
+      <UserForm initial={initial} editing={Boolean(editingId)} onChange={setCurrent} onSubmit={save} />
+      {discardPrompt}
+    </>
   );
 }
 
 const styles = StyleSheet.create({
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  centerText: { textAlign: 'center' },
 });
